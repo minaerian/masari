@@ -4,6 +4,28 @@
     <meta charset="UTF-8">
     <title>Encrypt/Decrypt</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .card {
+            margin-bottom: 20px;
+        }
+        .result-box {
+            white-space: pre-wrap;
+            overflow: auto;
+        }
+        .title {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header-img {
+            width: 100px;
+        }
+    </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
@@ -15,6 +37,7 @@
                     data: $(this).serialize(),
                     success: function(response) {
                         $('#encrypt-result').val(response.result);
+                        $('#copy-encrypt-btn').show();
                     },
                     error: function() {
                         $('#encrypt-result').val('An error occurred.');
@@ -29,55 +52,89 @@
                     url: '/decrypt',
                     data: $(this).serialize(),
                     success: function(response) {
-                        $('#decrypt-result').val(response.result);
+                        if (response.result === "Error: Incorrect passphrase") {
+                            $('#decrypt-result').val('The provided passphrase is incorrect. Please try again.');
+                        } else {
+                            $('#decrypt-result').val(response.result);
+                        }
                     },
                     error: function() {
                         $('#decrypt-result').val('An error occurred.');
                     }
                 });
             });
+
+            $('#copy-encrypt-btn').click(function() {
+                var copyText = document.getElementById("encrypt-result");
+                copyText.select();
+                copyText.setSelectionRange(0, 99999); /* For mobile devices */
+                document.execCommand("copy");
+                
+                var button = $('#copy-encrypt-btn');
+                button.text('Copied!');
+                setTimeout(function() {
+                    button.text('Copy');
+                }, 2000); // Revert back to 'Copy' after 2 seconds
+            });
         });
     </script>
 </head>
 <body>
     <div class="container">
-        <h1 class="mt-5">Encrypt/Decrypt</h1>
+        <div class="title">
+            <img src="https://via.placeholder.com/100" alt="Logo" class="header-img">
+            <h1>Encrypt/Decrypt</h1>
+        </div>
 
-        <div class="row mt-4">
+        <div class="row">
             <div class="col-md-6">
-                <h2>Encrypt</h2>
-                <form id="encrypt-form">
-                    <div class="form-group">
-                        <label for="password">Text to Encrypt:</label>
-                        <input type="text" id="password" name="password" class="form-control" required>
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h2>Encrypt</h2>
                     </div>
-                    <div class="form-group">
-                        <label for="passphrase">Passphrase:</label>
-                        <input type="text" id="passphrase" name="passphrase" class="form-control" required>
+                    <div class="card-body">
+                        <form id="encrypt-form">
+                            <div class="form-group">
+                                <label for="password">Text to Encrypt:</label>
+                                <input type="text" id="password" name="password" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="passphrase">Passphrase:</label>
+                                <input type="text" id="passphrase" name="passphrase" class="form-control" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Encrypt</button>
+                        </form>
+                        <div class="form-group mt-3">
+                            <label for="encrypt-result">Encrypted Result:</label>
+                            <textarea id="encrypt-result" class="form-control result-box" rows="4" readonly></textarea>
+                            <button id="copy-encrypt-btn" class="btn btn-secondary mt-2" style="display:none;">Copy</button>
+                        </div>
                     </div>
-                    <button type="submit" class="btn btn-primary">Encrypt</button>
-                </form>
-                <div class="form-group mt-3">
-                    <label for="encrypt-result">Encrypted Result:</label>
-                    <textarea id="encrypt-result" class="form-control" rows="4" readonly></textarea>
                 </div>
             </div>
+
             <div class="col-md-6">
-                <h2>Decrypt</h2>
-                <form id="decrypt-form">
-                    <div class="form-group">
-                        <label for="encrypted_value">Encrypted Text:</label>
-                        <input type="text" id="encrypted_value" name="encrypted_value" class="form-control" required>
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h2>Decrypt</h2>
                     </div>
-                    <div class="form-group">
-                        <label for="passphrase">Passphrase:</label>
-                        <input type="text" id="passphrase" name="passphrase" class="form-control" required>
+                    <div class="card-body">
+                        <form id="decrypt-form">
+                            <div class="form-group">
+                                <label for="encrypted_value">Encrypted Text:</label>
+                                <input type="text" id="encrypted_value" name="encrypted_value" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="passphrase">Passphrase:</label>
+                                <input type="text" id="passphrase" name="passphrase" class="form-control" required>
+                            </div>
+                            <button type="submit" class="btn btn-success">Decrypt</button>
+                        </form>
+                        <div class="form-group mt-3">
+                            <label for="decrypt-result">Decrypted Result:</label>
+                            <textarea id="decrypt-result" class="form-control result-box" rows="4" readonly></textarea>
+                        </div>
                     </div>
-                    <button type="submit" class="btn btn-primary">Decrypt</button>
-                </form>
-                <div class="form-group mt-3">
-                    <label for="decrypt-result">Decrypted Result:</label>
-                    <textarea id="decrypt-result" class="form-control" rows="4" readonly></textarea>
                 </div>
             </div>
         </div>
