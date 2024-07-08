@@ -1,0 +1,59 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Encrypt/Decrypt</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#encrypt-form').submit(function(event) {
+                event.preventDefault();
+                $.ajax({
+                    type: 'POST',
+                    url: '/encrypt',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        $('#encrypt-result').text('Encrypted: ' + response.result);
+                    }
+                });
+            });
+
+            $('#decrypt-form').submit(function(event) {
+                event.preventDefault();
+                $.ajax({
+                    type: 'POST',
+                    url: '/decrypt',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        $('#decrypt-result').text('Decrypted: ' + response.result);
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Encrypt/Decrypt</h1>
+
+    <h2>Encrypt</h2>
+    <form id="encrypt-form">
+        <label for="password">Text to Encrypt:</label>
+        <input type="text" id="password" name="password"><br><br>
+        <label for="passphrase">Passphrase:</label>
+        <input type="text" id="passphrase" name="passphrase"><br><br>
+        <input type="submit" value="Encrypt">
+    </form>
+    <p id="encrypt-result"></p>
+
+    <h2>Decrypt</h2>
+    <form id="decrypt-form">
+        <label for="encrypted_value">Encrypted Text:</label>
+        <input type="text" id="encrypted_value" name="encrypted_value"><br><br>
+        <label for="passphrase">Passphrase:</label>
+        <input type="text" id="passphrase" name="passphrase"><br><br>
+        <input type="submit" value="Decrypt">
+    </form>
+    <p id="decrypt-result"></p>
+</body>
+</html>
