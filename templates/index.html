@@ -41,6 +41,13 @@
         .form-group.short-label label {
             width: 80px; /* Adjust width for shorter labels */
         }
+        .form-group.full-width {
+            width: 100%;
+        }
+        .form-group.full-width label,
+        .form-group.full-width input {
+            width: 100%;
+        }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
@@ -159,11 +166,11 @@
                             </div>
                             <button type="submit" class="btn btn-primary">Encrypt</button>
                         </form>
-                        <div class="form-group mt-3">
+                        <div class="form-group mt-3 full-width">
                             <label for="encrypt-result">Encrypted Result:</label>
                             <textarea id="encrypt-result" class="form-control result-box" rows="4" readonly></textarea>
-                            <button id="copy-encrypt-btn" class="btn btn-secondary mt-2" style="display:none;">Copy</button>
                         </div>
+                        <button id="copy-encrypt-btn" class="btn btn-secondary mt-2" style="display:none;">Copy</button>
                     </div>
                 </div>
             </div>
@@ -185,7 +192,7 @@
                             </div>
                             <button type="submit" class="btn btn-success">Decrypt</button>
                         </form>
-                        <div class="form-group mt-3">
+                        <div class="form-group mt-3 full-width">
                             <label for="decrypt-result">Decrypted Result:</label>
                             <textarea id="decrypt-result" class="form-control result-box" rows="4" readonly></textarea>
                         </div>
