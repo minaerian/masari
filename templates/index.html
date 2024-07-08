@@ -27,16 +27,55 @@
             display: block;
             margin: 0 auto 20px;
         }
+        .form-group {
+            display: flex;
+            align-items: center;
+        }
+        .form-group label {
+            width: 80px;
+            margin-right: 10px;
+        }
+        .form-group input {
+            flex: 1;
+        }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
+            function updateWordInputs(count) {
+                let wordInputsHtml = '';
+                for (let i = 1; i <= count; i++) {
+                    wordInputsHtml += `<div class="form-group">
+                        <label for="word${i}">Word ${i}:</label>
+                        <input type="text" id="word${i}" name="word${i}" class="form-control word-input" pattern="[A-Za-z]+" required>
+                    </div>`;
+                }
+                $('#word-inputs').html(wordInputsHtml);
+            }
+
+            $('#word-count').change(function() {
+                const count = parseInt($(this).val(), 10);
+                updateWordInputs(count);
+            });
+
+            // Initialize with 12 words input fields
+            updateWordInputs(12);
+
             $('#encrypt-form').submit(function(event) {
                 event.preventDefault();
+                const words = [];
+                $('#encrypt-form input[type="text"]').each(function() {
+                    words.push($(this).val());
+                });
+                const data = {
+                    words: words.join(' '),
+                    passphrase: $('#encrypt-passphrase').val()
+                };
                 $.ajax({
                     type: 'POST',
                     url: '/encrypt',
-                    data: $(this).serialize(),
+                    data: JSON.stringify(data),
+                    contentType: 'application/json',
                     success: function(response) {
                         $('#encrypt-result').val(response.result);
                         $('#copy-encrypt-btn').show();
@@ -49,16 +88,18 @@
 
             $('#decrypt-form').submit(function(event) {
                 event.preventDefault();
+                const data = {
+                    encrypted_value: $('#encrypted_value').val(),
+                    passphrase: $('#decrypt-passphrase').val()
+                };
                 $.ajax({
                     type: 'POST',
                     url: '/decrypt',
-                    data: $(this).serialize(),
+                    data: JSON.stringify(data),
+                    contentType: 'application/json',
                     success: function(response) {
-                        if (response.result === "Error: Incorrect passphrase") {
-                            $('#decrypt-result').val('The provided passphrase is incorrect. Please try again.');
-                        } else {
-                            $('#decrypt-result').val(response.result);
-                        }
+                        $('#decrypt-result').val(response.result);
+                        autoResizeTextarea($('#decrypt-result'));
                     },
                     error: function() {
                         $('#decrypt-result').val('An error occurred.');
@@ -78,6 +119,11 @@
                     button.text('Copy');
                 }, 2000); // Revert back to 'Copy' after 2 seconds
             });
+
+            function autoResizeTextarea(textarea) {
+                textarea.css('height', 'auto');
+                textarea.css('height', textarea.prop('scrollHeight') + 'px');
+            }
         });
     </script>
 </head>
@@ -97,12 +143,16 @@
                     <div class="card-body">
                         <form id="encrypt-form">
                             <div class="form-group">
-                                <label for="password">Text to Encrypt:</label>
-                                <input type="text" id="password" name="password" class="form-control" required>
+                                <label for="word-count">Number of Words:</label>
+                                <select id="word-count" class="form-control">
+                                    <option value="12">12</option>
+                                    <option value="24">24</option>
+                                </select>
                             </div>
+                            <div id="word-inputs"></div>
                             <div class="form-group">
-                                <label for="passphrase">Passphrase:</label>
-                                <input type="text" id="passphrase" name="passphrase" class="form-control" required>
+                                <label for="encrypt-passphrase">Passphrase:</label>
+                                <input type="text" id="encrypt-passphrase" name="passphrase" class="form-control" required>
                             </div>
                             <button type="submit" class="btn btn-primary">Encrypt</button>
                         </form>
@@ -127,8 +177,8 @@
                                 <input type="text" id="encrypted_value" name="encrypted_value" class="form-control" required>
                             </div>
                             <div class="form-group">
-                                <label for="passphrase">Passphrase:</label>
-                                <input type="text" id="passphrase" name="passphrase" class="form-control" required>
+                                <label for="decrypt-passphrase">Passphrase:</label>
+                                <input type="text" id="decrypt-passphrase" name="passphrase" class="form-control" required>
                             </div>
                             <button type="submit" class="btn btn-success">Decrypt</button>
                         </form>

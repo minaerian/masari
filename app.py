@@ -1,4 +1,3 @@
-# app.py
 from flask import Flask, request, jsonify, render_template
 from password import encrypt_password, decrypt_password
 
@@ -10,15 +9,17 @@ def index():
 
 @app.route('/encrypt', methods=['POST'])
 def encrypt():
-    password = request.form['password']
-    passphrase = request.form['passphrase']
-    encrypted = encrypt_password(password, passphrase)
+    data = request.json
+    words = data['words']
+    passphrase = data['passphrase']
+    encrypted = encrypt_password(words, passphrase)
     return jsonify(result=encrypted)
 
 @app.route('/decrypt', methods=['POST'])
 def decrypt():
-    encrypted_value = request.form['encrypted_value']
-    passphrase = request.form['passphrase']
+    data = request.json
+    encrypted_value = data['encrypted_value']
+    passphrase = data['passphrase']
     decrypted = decrypt_password(encrypted_value, passphrase)
     return jsonify(result=decrypted)
 
