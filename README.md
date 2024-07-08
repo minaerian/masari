@@ -88,11 +88,3 @@ MASARI/
    - The ciphertext is decrypted using AES in CBC mode with the derived key and IV.
    - The decrypted text is then unpadded to retrieve the original text.
 ```
-
-### Adding the README to Your Project
-
-1. Create a file named `README.md` in the root of your project directory.
-2. Copy and paste the above content into the `README.md` file.
-3. Save the file.
-
-Now your project includes a comprehensive README file that explains how to use the application both through the web interface and the command-line interface, as well as the underlying logic of the encryption and decryption process.
