@@ -1,9 +1,9 @@
-<!-- templates/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Encrypt/Decrypt</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
@@ -14,7 +14,10 @@
                     url: '/encrypt',
                     data: $(this).serialize(),
                     success: function(response) {
-                        $('#encrypt-result').text('Encrypted: ' + response.result);
+                        $('#encrypt-result').val(response.result);
+                    },
+                    error: function() {
+                        $('#encrypt-result').val('An error occurred.');
                     }
                 });
             });
@@ -26,7 +29,10 @@
                     url: '/decrypt',
                     data: $(this).serialize(),
                     success: function(response) {
-                        $('#decrypt-result').text('Decrypted: ' + response.result);
+                        $('#decrypt-result').val(response.result);
+                    },
+                    error: function() {
+                        $('#decrypt-result').val('An error occurred.');
                     }
                 });
             });
@@ -34,26 +40,47 @@
     </script>
 </head>
 <body>
-    <h1>Encrypt/Decrypt</h1>
+    <div class="container">
+        <h1 class="mt-5">Encrypt/Decrypt</h1>
 
-    <h2>Encrypt</h2>
-    <form id="encrypt-form">
-        <label for="password">Text to Encrypt:</label>
-        <input type="text" id="password" name="password"><br><br>
-        <label for="passphrase">Passphrase:</label>
-        <input type="text" id="passphrase" name="passphrase"><br><br>
-        <input type="submit" value="Encrypt">
-    </form>
-    <p id="encrypt-result"></p>
-
-    <h2>Decrypt</h2>
-    <form id="decrypt-form">
-        <label for="encrypted_value">Encrypted Text:</label>
-        <input type="text" id="encrypted_value" name="encrypted_value"><br><br>
-        <label for="passphrase">Passphrase:</label>
-        <input type="text" id="passphrase" name="passphrase"><br><br>
-        <input type="submit" value="Decrypt">
-    </form>
-    <p id="decrypt-result"></p>
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <h2>Encrypt</h2>
+                <form id="encrypt-form">
+                    <div class="form-group">
+                        <label for="password">Text to Encrypt:</label>
+                        <input type="text" id="password" name="password" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="passphrase">Passphrase:</label>
+                        <input type="text" id="passphrase" name="passphrase" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Encrypt</button>
+                </form>
+                <div class="form-group mt-3">
+                    <label for="encrypt-result">Encrypted Result:</label>
+                    <textarea id="encrypt-result" class="form-control" rows="4" readonly></textarea>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h2>Decrypt</h2>
+                <form id="decrypt-form">
+                    <div class="form-group">
+                        <label for="encrypted_value">Encrypted Text:</label>
+                        <input type="text" id="encrypted_value" name="encrypted_value" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="passphrase">Passphrase:</label>
+                        <input type="text" id="passphrase" name="passphrase" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Decrypt</button>
+                </form>
+                <div class="form-group mt-3">
+                    <label for="decrypt-result">Decrypted Result:</label>
+                    <textarea id="decrypt-result" class="form-control" rows="4" readonly></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
