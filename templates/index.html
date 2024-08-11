@@ -97,25 +97,38 @@
             });
 
             $('#decrypt-form').submit(function(event) {
-                event.preventDefault();
-                const data = {
-                    encrypted_value: $('#encrypted_value').val(),
-                    passphrase: $('#decrypt-passphrase').val()
-                };
-                $.ajax({
-                    type: 'POST',
-                    url: '/decrypt',
-                    data: JSON.stringify(data),
-                    contentType: 'application/json',
-                    success: function(response) {
-                        $('#decrypt-result').val(response.result);
-                        autoResizeTextarea($('#decrypt-result'));
-                    },
-                    error: function() {
-                        $('#decrypt-result').val('An error occurred.');
+            event.preventDefault();
+            const data = {
+                encrypted_value: $('#encrypted_value').val(),
+                passphrase: $('#decrypt-passphrase').val()
+            };
+            $.ajax({
+                type: 'POST',
+                url: '/decrypt',
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                success: function(response) {
+                    $('#decrypt-result').val(response.result);
+                    autoResizeTextarea($('#decrypt-result'));
+                },
+                error: function(xhr) {
+                    let errorMessage = 'An unexpected error occurred.';
+                    try {
+                        const jsonResponse = JSON.parse(xhr.responseText);
+                        if (jsonResponse.result) {
+                            errorMessage = jsonResponse.result;
+                        }
+                    } catch (e) {
+                        console.error('Failed to parse error response:', e);
+                        console.error('Response text:', xhr.responseText);
                     }
-                });
+                    $('#decrypt-result').val(errorMessage);
+                }
             });
+        });
+
+
+
 
             $('#copy-encrypt-btn').click(function() {
                 var copyText = document.getElementById("encrypt-result");
