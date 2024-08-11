@@ -50,6 +50,7 @@
         }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ url_for('static', filename='bip39words.js') }}"></script> <!-- Load the word list -->
     <script>
         $(document).ready(function() {
             function updateWordInputs(count) {
@@ -61,6 +62,16 @@
                     </div>`;
                 }
                 $('#word-inputs').html(wordInputsHtml);
+            }
+
+            function validateWords(words) {
+                const invalidWords = [];
+                words.forEach(word => {
+                    if (!bip39Words.includes(word)) {
+                        invalidWords.push(word);
+                    }
+                });
+                return invalidWords;
             }
 
             $('#word-count').change(function() {
@@ -75,8 +86,16 @@
                 event.preventDefault();
                 const words = [];
                 $('#encrypt-form input[type="text"]').each(function() {
-                    words.push($(this).val());
+                    words.push($(this).val().trim());
                 });
+
+                // Validate the words against the bip39 list
+                const invalidWords = validateWords(words);
+                if (invalidWords.length > 0) {
+                    alert('Invalid words detected: ' + invalidWords.join(', '));
+                    return;
+                }
+
                 const data = {
                     words: words.join(' '),
                     passphrase: $('#encrypt-passphrase').val()
@@ -97,38 +116,35 @@
             });
 
             $('#decrypt-form').submit(function(event) {
-            event.preventDefault();
-            const data = {
-                encrypted_value: $('#encrypted_value').val(),
-                passphrase: $('#decrypt-passphrase').val()
-            };
-            $.ajax({
-                type: 'POST',
-                url: '/decrypt',
-                data: JSON.stringify(data),
-                contentType: 'application/json',
-                success: function(response) {
-                    $('#decrypt-result').val(response.result);
-                    autoResizeTextarea($('#decrypt-result'));
-                },
-                error: function(xhr) {
-                    let errorMessage = 'An unexpected error occurred.';
-                    try {
-                        const jsonResponse = JSON.parse(xhr.responseText);
-                        if (jsonResponse.result) {
-                            errorMessage = jsonResponse.result;
+                event.preventDefault();
+                const data = {
+                    encrypted_value: $('#encrypted_value').val(),
+                    passphrase: $('#decrypt-passphrase').val()
+                };
+                $.ajax({
+                    type: 'POST',
+                    url: '/decrypt',
+                    data: JSON.stringify(data),
+                    contentType: 'application/json',
+                    success: function(response) {
+                        $('#decrypt-result').val(response.result);
+                        autoResizeTextarea($('#decrypt-result'));
+                    },
+                    error: function(xhr) {
+                        let errorMessage = 'An unexpected error occurred.';
+                        try {
+                            const jsonResponse = JSON.parse(xhr.responseText);
+                            if (jsonResponse.result) {
+                                errorMessage = jsonResponse.result;
+                            }
+                        } catch (e) {
+                            console.error('Failed to parse error response:', e);
+                            console.error('Response text:', xhr.responseText);
                         }
-                    } catch (e) {
-                        console.error('Failed to parse error response:', e);
-                        console.error('Response text:', xhr.responseText);
+                        $('#decrypt-result').val(errorMessage);
                     }
-                    $('#decrypt-result').val(errorMessage);
-                }
+                });
             });
-        });
-
-
-
 
             $('#copy-encrypt-btn').click(function() {
                 var copyText = document.getElementById("encrypt-result");
