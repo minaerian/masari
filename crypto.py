@@ -71,6 +71,8 @@ def decrypt_password(encrypted_password, passphrase):
         return numbered_words
     except InvalidKey:
         return "Error: Incorrect passphrase"
-    except Exception as e:  # Handle padding errors and other exceptions
+    except ValueError as e:
+        # This handles padding errors
+        return "Error: Decryption failed due to incorrect padding or data corruption"
+    except Exception as e:
         return f"Error: {str(e)}"
-
