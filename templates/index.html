@@ -85,7 +85,7 @@
             $('#encrypt-form').submit(function(event) {
                 event.preventDefault();
                 const words = [];
-                $('#encrypt-form input[type="text"]').each(function() {
+                $('#encrypt-form input[name^="word"]').each(function() { // Only target word inputs
                     words.push($(this).val().trim());
                 });
 
@@ -98,7 +98,7 @@
 
                 const data = {
                     words: words.join(' '),
-                    passphrase: $('#encrypt-passphrase').val()
+                    passphrase: $('#encrypt-passphrase').val() // Passphrase is not validated
                 };
                 $.ajax({
                     type: 'POST',
