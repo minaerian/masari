@@ -36,7 +36,8 @@ MASARI/
 2. Build the Docker image:
 
    ```bash
-   docker build -t my_python_app .
+   docker build --no-cache -t my_python_app .
+
    ```
 
 ### Running the Application
