@@ -22,9 +22,10 @@ MASARI/
 
 ### Prerequisites
 
-- Docker must be installed on your system.
+- Python 3.10 or later
+- `pip` for installing dependencies
 
-### Building the Docker Image
+### Installing Dependencies
 
 1. Clone the repository and navigate to the project directory:
 
@@ -33,58 +34,58 @@ MASARI/
    cd MASARI
    ```
 
-2. Build the Docker image:
+2. Install required packages:
 
    ```bash
-   docker build --no-cache -t my_python_app .
-
+   pip install -r requirements.txt
    ```
 
 ### Running the Application
 
 #### Web Interface
 
-1. Run the Docker container, mapping a port from your host to the container (e.g., 5001):
+1. Start the Flask server:
 
    ```bash
-   docker run -it --rm -p 5001:5000 my_python_app
+   python app_v2.py
    ```
 
-2. Open your browser and navigate to `http://localhost:5001`.
-
-3. Use the web interface to encrypt or decrypt text by entering the required information and clicking the corresponding button. The result will be displayed on the same page.
+2. Open your browser and navigate to `http://localhost:5000` to encrypt or decrypt text.
 
 #### Command-Line Interface (CLI)
 
-1. Run the Docker container and specify the `main.py` script to use the CLI:
+Run the CLI directly:
 
-   ```bash
-   docker run -it --rm my_python_app python main.py
-   ```
+```bash
+python cli_v2.py
+```
 
-2. Follow the prompts to encrypt or decrypt text:
-   - Select (E)ncrypt or (D)ecrypt.
-   - Enter the text or encrypted value.
-   - Enter the passphrase.
-   - The result will be displayed in the terminal.
+Follow the prompts to encrypt or decrypt text.
+
+### Packaging with PyInstaller
+
+To create a stand‑alone executable (replace `:` with `;` on Windows):
+
+```bash
+pyinstaller --onefile --add-data "templates:templates" --add-data "static:static" app_v2.py
+```
+
+The executable will be placed in the `dist` directory. Run it to launch the web interface without needing Python installed.
 
 ## How It Works
 
 ### Encryption and Decryption Logic
 
 1. **Key Derivation Function (KDF):**
-   - The KDF uses PBKDF2 with SHA-256 to derive a 32-byte key from the passphrase and a randomly generated salt.
-   - This ensures that even if the same passphrase is used, the derived key will be different for each encryption due to the unique salt.
+   - `scrypt` derives a 32‑byte key from the passphrase and a randomly generated salt.
+   - A unique salt ensures a different key for each encryption.
 
-2. **Padding:**
-   - The text to be encrypted is padded to ensure it is a multiple of the AES block size (16 bytes).
-
-3. **Encryption:**
-   - The text is encrypted using AES in CBC mode with the derived key and a randomly generated initialization vector (IV).
+2. **Encryption:**
+   - The text is encrypted using AES‑GCM with the derived key and a 12‑byte IV.
+   - AES‑GCM provides both confidentiality and integrity; no padding is required.
    - The encrypted text, salt, and IV are concatenated and base64 encoded for storage or transmission.
 
-4. **Decryption:**
-   - The base64 encoded string is decoded to extract the salt, IV, and ciphertext.
-   - The same passphrase and extracted salt are used to derive the AES key.
-   - The ciphertext is decrypted using AES in CBC mode with the derived key and IV.
-   - The decrypted text is then unpadded to retrieve the original text.
+3. **Decryption:**
+   - The base64 string is decoded to obtain the salt, IV, and ciphertext.
+   - The same passphrase and salt derive the key again.
+   - The ciphertext is decrypted using AES‑GCM, verifying its integrity automatically.
